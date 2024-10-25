@@ -39,7 +39,6 @@ declare -A ADDONS=(
 )
 
 install() {
-    echo "$USER - $EUID"
     echo "Cập nhật và nâng cấp hệ thống..."
     sudo apt update -y && apt upgrade -y
 
