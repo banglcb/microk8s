@@ -12,7 +12,7 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
-original_user=$(ps -o user= -p "$PPID")
+original_user="${SUDO_USER:-$(whoami)}"
 
 # Danh sách các addon và mô tả
 declare -A ADDONS=(
