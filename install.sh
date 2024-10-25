@@ -42,7 +42,7 @@ declare -A ADDONS=(
 
 # Hàm cài đặt MicroK8s
 install() {
-    echo "$USER - $EUID"
+    echo "$USER - $(whoami) - $EUID"
     echo "Cập nhật và nâng cấp hệ thống..."
      apt update -y && apt upgrade -y
 
@@ -55,11 +55,12 @@ install() {
     echo "Cài đặt MicroK8s..."
 	snap install microk8s --classic
 	
-	usermod -a -G microk8s $USER
-	chown -R k8sadmin $HOME/.kube
-	mkdir -p $HOME/.kube
-	chown -R $USER $HOME/.kube
-	microk8s.kubectl config view --raw > $HOME/.kube/config
+    username=$(whoami)
+	
+    usermod -a -G microk8s "$username"
+    mkdir -p "$HOME/.kube"
+    chown -R "$username" "$HOME/.kube"
+    microk8s.kubectl config view --raw > "$HOME/.kube/config"
 	
 	manage_addons
 
