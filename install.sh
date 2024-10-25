@@ -53,14 +53,13 @@ install() {
     sudo microk8s.status --wait-ready
 
     sudo snap alias microk8s.kubectl kubectl
-
-    if ! id -nG "$USER" | grep -qw "microk8s"; then
-        sudo usermod -aG microk8s $USER
-        sudo mkdir -p $HOME/.kube
-        sudo chown -R $USER:$USER $HOME/.kube
-        sudo microk8s.kubectl config view --raw > $HOME/.kube/config
-        manage_addons
-    fi
+	
+	sudo usermod -aG microk8s $USER
+	sudo mkdir -p $HOME/.kube
+	sudo chown -R $USER:$USER $HOME/.kube
+	sudo microk8s.kubectl config view --raw > $HOME/.kube/config
+	
+	manage_addons
 }
 
 main_menu() {
