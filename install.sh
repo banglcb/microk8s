@@ -53,17 +53,17 @@ install() {
     }
 
     echo "Cài đặt MicroK8s..."
-     snap install microk8s --classic
-     microk8s.status --wait-ready
-
-     snap alias microk8s.kubectl kubectl
-
-	 usermod -a -G microk8s $USER
-     chown -R k8sadmin $HOME/.kube
-	 mkdir -p $HOME/.kube
-	 chown -R $USER $HOME/.kube
-	 microk8s.kubectl config view --raw > $HOME/.kube/config
+	snap install microk8s --classic
+	
+	usermod -a -G microk8s $USER
+	chown -R k8sadmin $HOME/.kube
+	mkdir -p $HOME/.kube
+	chown -R $USER $HOME/.kube
+	microk8s.kubectl config view --raw > $HOME/.kube/config
+	
 	manage_addons
+
+	snap alias microk8s.kubectl kubectl
 }
 
 # Hiển thị menu chính
@@ -93,6 +93,7 @@ main_menu() {
 
 # Quản lý addons
 manage_addons() {
+	microk8s.status --wait-ready
     echo "1. Bật addon"
     echo "2. Tắt addon"
     echo "3. Thoát"
