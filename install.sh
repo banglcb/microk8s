@@ -56,14 +56,15 @@ install() {
     snap install microk8s --classic
     microk8s.status --wait-ready
 
-    sudo snap alias microk8s.kubectl kubectl
-	
-	usermod -aG microk8s $USER
-	mkdir -p $HOME/.kube
-	chown -R $USER:$USER $HOME/.kube
-	microk8s.kubectl config view --raw > $HOME/.kube/config
-	
-	manage_addons
+    snap alias microk8s.kubectl kubectl
+
+    if ! id -nG "$USER" | grep -qw "microk8s"; then
+        usermod -aG microk8s $USER
+        mkdir -p $HOME/.kube
+        chown -R $USER:$USER $HOME/.kube
+        microk8s.kubectl config view --raw > $HOME/.kube/config
+        manage_addons
+    fi
 }
 
 # Hiển thị menu chính
@@ -122,7 +123,7 @@ manage_addons() {
         if [[ "$choice" -ge 1 && "$choice" -lt "$count" ]]; then
             selected_addon="${addon_keys[$((choice - 1))]}"
             echo "Đang $action $selected_addon (${ADDONS[$selected_addon]})..."
-            sudo microk8s "$action" "$selected_addon"
+            microk8s "$action" "$selected_addon"
         else
             echo "Không hợp lệ!"
         fi
