@@ -12,6 +12,8 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
+original_user=$(ps -o user= -p "$PPID")
+
 # Danh sách các addon và mô tả
 declare -A ADDONS=(
     [cert-manager]="Quản lý chứng chỉ gốc đám mây"
@@ -42,7 +44,7 @@ declare -A ADDONS=(
 
 # Hàm cài đặt MicroK8s
 install() {
-    echo "$USER - $(whoami) - $EUID"
+    echo "Người dùng gốc: $original_user - $(whoami) - $EUID"
     echo "Cập nhật và nâng cấp hệ thống..."
      apt update -y && apt upgrade -y
 
@@ -55,7 +57,7 @@ install() {
     echo "Cài đặt MicroK8s..."
 	snap install microk8s --classic
 	
-    username=$(whoami)
+    username="$original_user"
 	
     usermod -a -G microk8s "$username"
     mkdir -p "$HOME/.kube"
