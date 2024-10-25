@@ -12,7 +12,8 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
-original_user="${SUDO_USER:-$(whoami)}"
+user="${SUDO_USER:-$(whoami)}"
+home=$(getent passwd "$user" | cut -d: -f6)
 
 # Danh sách các addon và mô tả
 declare -A ADDONS=(
@@ -44,7 +45,7 @@ declare -A ADDONS=(
 
 # Hàm cài đặt MicroK8s
 install() {
-    echo "Người dùng gốc: $original_user - $(whoami) - $EUID"
+    echo "Người dùng gốc: $user - $(whoami) - $EUID"
     echo "Cập nhật và nâng cấp hệ thống..."
      apt update -y && apt upgrade -y
 
@@ -57,12 +58,10 @@ install() {
     echo "Cài đặt MicroK8s..."
 	snap install microk8s --classic
 	
-    username="$original_user"
-	
-    usermod -a -G microk8s "$username"
-    mkdir -p "$HOME/.kube"
-    chown -R "$username" "$HOME/.kube"
-    microk8s.kubectl config view --raw > "$HOME/.kube/config"
+    usermod -aG microk8s "$user"
+    mkdir -p "$home/.kube"
+    chown -R "$user" "$home/.kube"
+    microk8s.kubectl config view --raw > "$home/.kube/config"
 	
 	manage_addons
 
