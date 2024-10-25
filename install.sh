@@ -44,25 +44,25 @@ declare -A ADDONS=(
 install() {
     echo "$USER - $EUID"
     echo "Cập nhật và nâng cấp hệ thống..."
-    sudo apt update -y && apt upgrade -y
+     apt update -y && apt upgrade -y
 
     # Kiểm tra và cài đặt nano nếu cần
     command -v nano >/dev/null || {
         read -p "Cài đặt nano? (y/n): " yn
-        [[ "$yn" =~ ^[Yy]$ ]] && sudo apt install nano -y
+        [[ "$yn" =~ ^[Yy]$ ]] &&  apt install nano -y
     }
 
     echo "Cài đặt MicroK8s..."
-    sudo snap install microk8s --classic
-    sudo microk8s.status --wait-ready
+     snap install microk8s --classic
+     microk8s.status --wait-ready
 
-    sudo snap alias microk8s.kubectl kubectl
+     snap alias microk8s.kubectl kubectl
 
-	sudo usermod -a -G microk8s $USER
-    sudo chown -R k8sadmin ~/.kube
-	sudo mkdir -p ~/.kube
-	sudo chown -R $USER ~/.kube
-	sudo microk8s.kubectl config view --raw > ~/.kube/config
+	 usermod -a -G microk8s $USER
+     chown -R k8sadmin $HOME/.kube
+	 mkdir -p $HOME/.kube
+	 chown -R $USER $HOME/.kube
+	 microk8s.kubectl config view --raw > $HOME/.kube/config
 	manage_addons
 }
 
@@ -122,7 +122,7 @@ manage_addons() {
         if [[ "$choice" -ge 1 && "$choice" -lt "$count" ]]; then
             selected_addon="${addon_keys[$((choice - 1))]}"
             echo "Đang $action $selected_addon (${ADDONS[$selected_addon]})..."
-            sudo microk8s "$action" "$selected_addon"
+             microk8s "$action" "$selected_addon"
         else
             echo "Không hợp lệ!"
         fi
