@@ -58,6 +58,7 @@ install() {
 
     sudo snap alias microk8s.kubectl kubectl
 
+	USER=$(whoami)
 	sudo usermod -a -G microk8s $USER
 	sudo mkdir -p $HOME/.kube
 	sudo chown -R $USER:$USER $HOME/.kube
