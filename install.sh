@@ -1,16 +1,18 @@
 #!/bin/bash
 
 # --------------------------------------------
-# Author: banglcb
-# Title: Script cài đặt và quản lý MicroK8s
-# Description: Script hỗ trợ cài đặt MicroK8s, quản lý node và addon
+# Tác giả: banglcb
+# Tiêu đề: Script cài đặt và quản lý MicroK8s
+# Mô tả: Script hỗ trợ cài đặt MicroK8s, quản lý node và addon
 # --------------------------------------------
 
+# Kiểm tra quyền root
 if [ "$EUID" -ne 0 ]; then
     echo "Vui lòng chạy script này với quyền root."
     exit 1
 fi
 
+# Danh sách các addon và mô tả
 declare -A ADDONS=(
     [cert-manager]="Quản lý chứng chỉ gốc đám mây"
     [cis-hardening]="Áp dụng quy trình cứng hóa CIS cho K8s"
@@ -38,30 +40,33 @@ declare -A ADDONS=(
     [ingress]="Bộ điều khiển Ingress cho truy cập từ bên ngoài"
 )
 
+# Hàm cài đặt MicroK8s
 install() {
+    echo "$USER - $EUID"
     echo "Cập nhật và nâng cấp hệ thống..."
-    sudo apt update -y && apt upgrade -y
+    apt update -y && apt upgrade -y
 
     # Kiểm tra và cài đặt nano nếu cần
     command -v nano >/dev/null || {
         read -p "Cài đặt nano? (y/n): " yn
-        [[ "$yn" =~ ^[Yy]$ ]] && sudo apt install nano -y
+        [[ "$yn" =~ ^[Yy]$ ]] && apt install nano -y
     }
 
     echo "Cài đặt MicroK8s..."
-    sudo snap install microk8s --classic
-    sudo microk8s.status --wait-ready
+    snap install microk8s --classic
+    microk8s.status --wait-ready
 
     sudo snap alias microk8s.kubectl kubectl
 	
-	sudo usermod -aG microk8s $USER
-	sudo mkdir -p $HOME/.kube
-	sudo chown -R $USER:$USER $HOME/.kube
-	sudo microk8s.kubectl config view --raw > $HOME/.kube/config
+	usermod -aG microk8s $USER
+	mkdir -p $HOME/.kube
+	chown -R $USER:$USER $HOME/.kube
+	microk8s.kubectl config view --raw > $HOME/.kube/config
 	
 	manage_addons
 }
 
+# Hiển thị menu chính
 main_menu() {
     clear
     echo "========================================="
@@ -86,6 +91,7 @@ main_menu() {
     fi
 }
 
+# Quản lý addons
 manage_addons() {
     echo "1. Bật addon"
     echo "2. Tắt addon"
@@ -127,4 +133,6 @@ manage_addons() {
         fi
     done
 }
+
+# Chạy menu chính
 main_menu
